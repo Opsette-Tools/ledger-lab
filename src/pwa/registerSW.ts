@@ -49,9 +49,9 @@ export async function registerSW(): Promise<void> {
     return;
   }
   try {
-    const mod = (await import(/* @vite-ignore */ "virtual:pwa-register")) as {
-      registerSW: (opts?: { immediate?: boolean }) => void;
-    };
+    const mod = (await import(
+      /* @vite-ignore */ "virtual:pwa-register" as string
+    )) as { registerSW: (opts?: { immediate?: boolean }) => void };
     mod.registerSW({ immediate: true });
   } catch {
     /* plugin not present in dev */
