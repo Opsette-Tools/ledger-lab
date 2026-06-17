@@ -1,40 +1,33 @@
-// @lovable.dev/vite-tanstack-config already includes the following — do NOT add them manually:
-//   - tanstackStart, viteReact, tailwindcss, tsConfigPaths, nitro, componentTagger, etc.
-import { defineConfig } from "@lovable.dev/vite-tanstack-config";
+import { defineConfig } from "vite";
+import react from "@vitejs/plugin-react";
+import tailwindcss from "@tailwindcss/vite";
+import tsconfigPaths from "vite-tsconfig-paths";
 import { VitePWA } from "vite-plugin-pwa";
 
-export default defineConfig({
-  tanstackStart: {
-    server: { entry: "server" },
+// https://vitejs.dev/config/
+export default defineConfig(({ command }) => ({
+  base: command === "build" ? "/ledger-lab/" : "/",
+  server: {
+    host: "::",
+    port: 8119,
+    hmr: {
+      overlay: false,
+    },
   },
-  vite: {
-    plugins: [
-      VitePWA({
-        registerType: "autoUpdate",
-        injectRegister: null,
-        devOptions: { enabled: false },
-        manifest: false, // we ship our own public/manifest.webmanifest
-        workbox: {
-          navigateFallbackDenylist: [/^\/~oauth/, /^\/api\//],
-          runtimeCaching: [
-            {
-              urlPattern: ({ request }) => request.mode === "navigate",
-              handler: "NetworkFirst",
-              options: { cacheName: "html-nav" },
-            },
-            {
-              urlPattern: ({ url, request }) =>
-                url.origin === self.location.origin &&
-                (request.destination === "script" ||
-                  request.destination === "style" ||
-                  request.destination === "font" ||
-                  request.destination === "image"),
-              handler: "CacheFirst",
-              options: { cacheName: "assets-v1" },
-            },
-          ],
-        },
-      }),
-    ],
+  plugins: [
+    react(),
+    tailwindcss(),
+    tsconfigPaths(),
+    VitePWA({
+      registerType: "autoUpdate",
+      devOptions: { enabled: false },
+      manifest: false,
+      workbox: {
+        navigateFallback: "index.html",
+      },
+    }),
+  ],
+  resolve: {
+    dedupe: ["react", "react-dom", "react/jsx-runtime", "react/jsx-dev-runtime"],
   },
-});
+}));

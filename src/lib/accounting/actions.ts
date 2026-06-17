@@ -271,6 +271,35 @@ export function recordExpense(
   };
 }
 
+export function recordCashSale(
+  s: LedgerSnapshot,
+  args: { amount: number; customer: string; date?: string },
+): ActionResult {
+  // A true walk-in cash sale: the customer pays AND receives the goods at the
+  // same instant. Money moved (Cash up) and it's earned (Revenue up) — so it
+  // posts identically in BOTH cash and accrual. This is the one case where the
+  // two methods agree, which is exactly the point of Lesson 1.
+  const amt = round2(args.amount);
+  const date = FORWARD_DATE(args.date);
+  const entry = buildEntry({
+    mode: s.mode,
+    description: `Cash sale — ${args.customer} $${amt}`,
+    plainEnglish: `${args.customer} paid $${amt} and walked out with the goods. Cash went up $${amt} and — because they paid and received it at the same moment — you earned it right now, so Sales Revenue went up $${amt} too. This looks identical in Cash and Accrual.`,
+    lines: [
+      { accountCode: "1000", debit: amt },
+      { accountCode: "4000", credit: amt },
+    ],
+    date,
+  });
+  return {
+    newEntries: [entry],
+    invoices: s.invoices,
+    deposits: s.deposits,
+    payments: s.payments,
+    explanation: entry.plainEnglish,
+  };
+}
+
 // ---------- Reverse actions ----------
 
 export function cancelUnpaidInvoice(
