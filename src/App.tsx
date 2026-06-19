@@ -5,13 +5,14 @@ import { OpsetteFooterLogo } from "./components/opsette-share";
 import { LedgerProvider, useLedger } from "./state/ledgerStore";
 import { ModeBar } from "./components/ledger/ModeBar";
 import { ExplanationBanner } from "./components/ledger/ExplanationBanner";
+import { BasicsView } from "./components/ledger/BasicsView";
 import { LearnView } from "./components/ledger/LearnView";
 import { ExploreView } from "./components/ledger/ExploreView";
 import { trialBalance } from "./lib/accounting/engine";
 
 const { Paragraph } = Typography;
 
-type Tab = "learn" | "explore";
+type Tab = "basics" | "learn" | "explore";
 
 export default function App() {
   return (
@@ -40,7 +41,7 @@ const WELCOME_DISMISSED_KEY = "ledger_lab_welcome_dismissed";
 
 function LedgerWorkspace() {
   const { state, setMode, reset } = useLedger();
-  const [tab, setTab] = useState<Tab>("learn");
+  const [tab, setTab] = useState<Tab>("basics");
   const [showWelcome, setShowWelcome] = useState(
     () => typeof window === "undefined" || window.localStorage.getItem(WELCOME_DISMISSED_KEY) !== "1",
   );
@@ -65,7 +66,7 @@ function LedgerWorkspace() {
           onClose={dismissWelcome}
           style={{ marginBottom: 16 }}
           message="Welcome to Ledger Lab"
-          description="Start on the Learn tab and play a guided lesson. Each step asks a question, then tells you in plain English exactly what it did to the books — and why cash and accrual sometimes disagree. Switch to Explore when you want to record events yourself."
+          description="New to this? Start on Basics — sort the accounts and feel the one rule the whole system runs on. Then Learn walks you through real situations step by step, and Explore lets you drive the books yourself."
         />
       )}
 
@@ -75,15 +76,23 @@ function LedgerWorkspace() {
         value={tab}
         onChange={(v) => setTab(v as Tab)}
         options={[
+          { label: "Basics — the accounts", value: "basics" },
           { label: "Learn — guided lessons", value: "learn" },
           { label: "Explore — drive the books", value: "explore" },
         ]}
         style={{ marginBottom: 16 }}
       />
 
-      <ModeBar mode={state.mode} onMode={setMode} balanced={tb.balanced} onReset={reset} />
+      {/* The Cash/Accrual method bar is only meaningful once you're recording
+          transactions. Basics is about the accounts themselves, so it's hidden
+          there to avoid implying the sort depends on the method. */}
+      {tab !== "basics" && (
+        <ModeBar mode={state.mode} onMode={setMode} balanced={tb.balanced} onReset={reset} />
+      )}
 
-      {tab === "learn" ? (
+      {tab === "basics" ? (
+        <BasicsView />
+      ) : tab === "learn" ? (
         // On Learn, each lesson narrates itself inline — no top banner needed.
         <LearnView />
       ) : (
