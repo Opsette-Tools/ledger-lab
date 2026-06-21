@@ -1,22 +1,18 @@
 import { useState } from "react";
-import { App as AntApp, Button, Card, Form, Modal, Space, Tooltip, Typography } from "antd";
+import { App as AntApp, Button, Card, Collapse, Form, Modal, Typography } from "antd";
+import { ArrowRightOutlined } from "@ant-design/icons";
 import { useLedger } from "../../state/ledgerStore";
 import * as A from "../../lib/accounting/actions";
-import {
-  FORWARD_ACTIONS,
-  REVERSE_ACTIONS,
-  SPECIAL_ACTIONS,
-  TITLES,
-  type ActionKey,
-} from "./actionConfig";
+import { EVENT_GROUPS, TITLES, type ActionKey, type EventGroup } from "./actionConfig";
 import { ActionForm } from "./ActionForm";
 
 const { Text } = Typography;
 
 /**
- * Free-play action board. Three grouped lanes — money in (forward), reverse
- * (money back), and the two special prepaid/recognize actions — each opening a
- * small form modal. This is the "poke at it yourself" half of Explore.
+ * Free-play action board, grouped by RELATIONSHIP so the structure teaches what
+ * connects to what: paired "stories" (send invoice → record payment) shown as
+ * linked steps, genuinely standalone events on their own, and reversals grouped
+ * with what each one undoes (because in a ledger you reverse, you never delete).
  */
 export function ActionsPanel() {
   const { snapshot, apply } = useLedger();
@@ -44,32 +40,16 @@ export function ActionsPanel() {
   };
 
   return (
-    <Card size="small" title="Record an event">
-      <Lane label="Money in / forward" color="#389e0d">
-        {FORWARD_ACTIONS.map((a) => (
-          <Button key={a.key} size="small" onClick={() => setOpenKey(a.key)}>
-            {a.label}
-          </Button>
+    <Card
+      size="small"
+      title="Record an event"
+      styles={{ header: { background: "#eef3f1", color: "#2f4f46" } }}
+    >
+      <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+        {EVENT_GROUPS.map((group) => (
+          <Group key={group.title} group={group} onOpen={setOpenKey} />
         ))}
-      </Lane>
-
-      <Lane label="Reverse / money back" color="#fa8c16">
-        {REVERSE_ACTIONS.map((a) => (
-          <Button key={a.key} size="small" onClick={() => setOpenKey(a.key)}>
-            {a.label}
-          </Button>
-        ))}
-      </Lane>
-
-      <Lane label="Special" color="#722ed1">
-        {SPECIAL_ACTIONS.map((a) => (
-          <Tooltip key={a.key} title={a.tip}>
-            <Button size="small" onClick={() => setOpenKey(a.key)}>
-              {a.label}
-            </Button>
-          </Tooltip>
-        ))}
-      </Lane>
+      </div>
 
       <Modal
         title={openKey ? TITLES[openKey] : ""}
@@ -85,15 +65,77 @@ export function ActionsPanel() {
   );
 }
 
-function Lane({ label, color, children }: { label: string; color: string; children: React.ReactNode }) {
+function Group({ group, onOpen }: { group: EventGroup; onOpen: (k: ActionKey) => void }) {
   return (
-    <div style={{ marginBottom: 12 }}>
-      <Text strong style={{ fontSize: 11, color, textTransform: "uppercase", letterSpacing: 0.4 }}>
-        {label}
+    <div>
+      <Text strong style={{ fontSize: 11, color: "#7a7a7a", textTransform: "uppercase", letterSpacing: 0.4 }}>
+        {group.title}
       </Text>
-      <Space wrap style={{ marginTop: 6, display: "flex" }}>
-        {children}
-      </Space>
+
+      {group.kind === "story" && (
+        <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 8, flexWrap: "wrap" }}>
+          <Button size="small" onClick={() => onOpen(group.first.key)}>
+            {group.first.label}
+          </Button>
+          <ArrowRightOutlined style={{ color: "#bbb" }} />
+          <Button size="small" onClick={() => onOpen(group.second.key)}>
+            {group.second.label}
+          </Button>
+        </div>
+      )}
+
+      {group.kind === "single" && (
+        <div style={{ display: "flex", gap: 8, marginTop: 8, flexWrap: "wrap" }}>
+          {group.actions.map((a) => (
+            <Button key={a.key} size="small" onClick={() => onOpen(a.key)}>
+              {a.label}
+            </Button>
+          ))}
+        </div>
+      )}
+
+      {group.kind === "undo" && (
+        // Collapsed by default — these reversals are the bulk of the height and
+        // the least-used events, so they tuck away to keep the panel compact.
+        <Collapse
+          size="small"
+          ghost
+          style={{ marginTop: 4 }}
+          items={[
+            {
+              key: "undo",
+              label: (
+                <Text type="secondary" style={{ fontSize: 12 }}>
+                  Show reversals ({group.actions.length})
+                </Text>
+              ),
+              children: (
+                <>
+                  <Text type="secondary" style={{ fontSize: 12, display: "block", marginBottom: 8 }}>
+                    {group.note}
+                  </Text>
+                  <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                    {group.actions.map((a) => (
+                      <div key={a.key} style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                        <Button
+                          size="small"
+                          onClick={() => onOpen(a.key)}
+                          style={{ minWidth: 150, textAlign: "left" }}
+                        >
+                          {a.label}
+                        </Button>
+                        <Text type="secondary" style={{ fontSize: 12 }}>
+                          {a.undoes}
+                        </Text>
+                      </div>
+                    ))}
+                  </div>
+                </>
+              ),
+            },
+          ]}
+        />
+      )}
     </div>
   );
 }

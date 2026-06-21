@@ -1,10 +1,9 @@
 import { useMemo, useState } from "react";
-import { Alert, App as AntdApp, ConfigProvider, Segmented, Space, Typography } from "antd";
+import { Alert, App as AntdApp, ConfigProvider, Segmented, Typography } from "antd";
 import { OpsetteHeader } from "./components/opsette-header";
 import { OpsetteFooterLogo } from "./components/opsette-share";
 import { LedgerProvider, useLedger } from "./state/ledgerStore";
 import { ModeBar } from "./components/ledger/ModeBar";
-import { ExplanationBanner } from "./components/ledger/ExplanationBanner";
 import { BasicsView } from "./components/ledger/BasicsView";
 import { LearnView } from "./components/ledger/LearnView";
 import { ExploreView } from "./components/ledger/ExploreView";
@@ -96,12 +95,10 @@ function LedgerWorkspace() {
         // On Learn, each lesson narrates itself inline — no top banner needed.
         <LearnView />
       ) : (
-        // On Explore, the user fires raw actions, so the running "what just
-        // happened" banner is the narration of their last move.
-        <Space direction="vertical" size="middle" style={{ width: "100%" }}>
-          <ExplanationBanner text={state.lastExplanation} mode={state.mode} />
-          <ExploreView />
-        </Space>
+        // On Explore, the "what just happened" narration lives inside the
+        // Journal panel (under its header), tied to the entry it describes —
+        // not as a detached banner up here that reads like ignorable instructions.
+        <ExploreView />
       )}
 
       <Paragraph

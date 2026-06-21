@@ -1,28 +1,64 @@
 import { useMemo } from "react";
 import { Card, Empty, Table, Tag, Typography } from "antd";
+import { CommentOutlined } from "@ant-design/icons";
 import { useLedger } from "../../state/ledgerStore";
 import { accountByCode, type JournalEntry } from "../../lib/accounting/engine";
-import { fmt } from "./format";
+import { fmt, ACCRUAL_BLUE, CASH_GREEN } from "./format";
 
 const { Paragraph, Text } = Typography;
 
 /**
  * The running journal — every entry, newest first, expandable to reveal the
- * debit/credit lines and the plain-English narration. The expand row is where
- * the "debits always equal credits" lesson lives.
+ * debit/credit lines and the plain-English narration.
+ *
+ * The "what just happened" line lives RIGHT HERE under the header — tied to the
+ * entry it describes — instead of as a detached callout up the page that reads
+ * like instructions you ignore. So when you post, the entry appears and its
+ * explanation appears with it, where your eyes already are.
  */
 export function JournalPanel() {
   const { state } = useLedger();
   const data = useMemo(() => [...state.entries].reverse(), [state.entries]);
+  const hasEntries = data.length > 0;
+  const accent = state.mode === "cash" ? CASH_GREEN : ACCRUAL_BLUE;
 
   return (
-    <Card size="small" title={`Journal (${state.entries.length} ${state.entries.length === 1 ? "entry" : "entries"})`}>
+    <Card
+      size="small"
+      title={`Journal (${state.entries.length} ${state.entries.length === 1 ? "entry" : "entries"})`}
+      styles={{ header: { background: "#eef3f1", color: "#2f4f46" } }}
+    >
+      {/* What just happened — narration of the most recent action, inline. */}
+      {hasEntries && (
+        <div
+          style={{
+            display: "flex",
+            gap: 8,
+            borderLeft: `4px solid ${accent}`,
+            background: state.mode === "cash" ? "#f6ffed" : "#e6f4ff",
+            borderRadius: 8,
+            padding: "10px 12px",
+            marginBottom: 12,
+          }}
+        >
+          <CommentOutlined style={{ color: accent, marginTop: 3 }} />
+          <div>
+            <Text strong style={{ fontSize: 12.5 }}>
+              What just happened ({state.mode === "cash" ? "Cash" : "Accrual"} mode)
+            </Text>
+            <Paragraph style={{ fontSize: 13, lineHeight: 1.5, margin: "2px 0 0" }}>
+              {state.lastExplanation}
+            </Paragraph>
+          </div>
+        </div>
+      )}
+
       {data.length === 0 ? (
         <Empty
           image={Empty.PRESENTED_IMAGE_SIMPLE}
           description={
             <Text type="secondary">
-              No entries yet. Record an action above, or run a guided lesson on the Learn tab.
+              No entries yet. Record an event on the left, or run a guided lesson on the Learn tab.
             </Text>
           }
         />

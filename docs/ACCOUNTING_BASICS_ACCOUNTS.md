@@ -104,3 +104,42 @@ Deposit Income, Sales Discounts, Operating Expenses, Bad Debt Expense). Reuse th
 source of truth; this lesson layer adds, per account: a one-line meaning, its partner list, and its
 "never" list. Add **Accounts Payable** to round out the "what I owe" side for the lesson (it's in
 the partner tables above).
+
+---
+
+## BUILD PROGRESS — 2026-06-18 (committed `a0dfe83`)
+
+**Built & shipped: the Accounting Basics tab, a 4-step learn-by-feel arc (now the FIRST tab).**
+Data lives in `src/lib/accounting/basics.ts`; components in `src/components/ledger/`, wired by
+`BasicsView.tsx`.
+
+Key reframing decision (Ruthnie's, validated by her learning it live): **teach POSITIONS — Left /
+Right — not the words "debit" / "credit"**, which fight intuition. *Left = what value went toward
+(Assets & Expenses); Right = where value came from (Liabilities, Equity, Income).* The official
+terms appear only as a small forgettable aside, never on the cards. Internal engine keys stay
+`debit`/`credit`; only the labels changed. She plans to carry this Left/Right model back into her
+parent app and abolish its misleading red/green debit/credit coloring.
+
+Steps (each one rung, sub-segmented inside the Basics tab):
+- **Step 0 — `TypeSort.tsx`** — sort the 5 TYPES into Left/Right. The foundation: every account
+  inherits its side from its type. Income carries a light `*` noting one contra exception (met in
+  Step 1) — Sales Discounts itself is NOT introduced here, deliberately.
+- **Step 1 — `HomeSideSort.tsx`** — sort the 11 accounts; tap-to-select shows the definition +
+  "when you'd use it" BEFORE placing so she reasons rather than guesses. Reframed to "which side it
+  goes UP on" (not "lives on") so it doesn't imply permanence.
+- **Step 2 — `UpOrDown.tsx`** — pick an account + up/down, watch which side it lands on. Plants
+  "home side = grows, opposite = shrinks." Resolves the recurring "why did AR jump ship" confusion.
+- **Step 3 — `Counterbalance.tsx`** — pick a real EVENT, set each of its two accounts' direction,
+  the scale shows Left vs Right and confirms when balanced. 6 events in `LEDGER_EVENTS`.
+
+Concepts she worked through and locked (don't re-explain unless she asks): cash vs revenue isn't
+double-dipping (*what you hold* vs *what you earned*); paying a bill grows the expense total (up);
+the **entity boundary** — the business is separate from the owner, books only see the business side
+(this cracked open owner-invest). Big takeaway she landed: *Left = the value itself, Right = the
+story of where it came from.*
+
+**NEXT (her plan):** revisit the **guided lessons (Learn tab) with fresh eyes** now that Basics
+exists — she'll report whether they still have quirks. The Learn lesson model is in
+`docs/LESSON_SCRIPTS.md`. Optional future Basics additions she deferred: a "both go down" event in
+Step 3 (pay off a loan / refund) to break the "one up one down" myth; a mirror-of-Step-1 drill.
+Process rule throughout: ONE rung at a time, script/explain first, she learns live and pushes back.

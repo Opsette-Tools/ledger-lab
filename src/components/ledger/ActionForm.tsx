@@ -32,11 +32,11 @@ export function ActionForm({
     case "send_invoice":
       return (
         <Form form={form} layout="vertical">
-          <Form.Item label="Customer" name="customer" rules={[{ required: true }]} initialValue="Acme Co.">
-            <Input />
+          <Form.Item label="Customer" name="customer" rules={[{ required: true }]}>
+            <Input placeholder="e.g. Acme Co." />
           </Form.Item>
-          <Form.Item label="Amount ($)" name="amount" rules={[{ required: true }]} initialValue={500}>
-            <InputNumber min={0.01} step={50} style={{ width: "100%" }} />
+          <Form.Item label="Amount ($)" name="amount" rules={[{ required: true }]}>
+            <InputNumber min={0.01} step={50} style={{ width: "100%" }} placeholder="0.00" />
           </Form.Item>
         </Form>
       );
@@ -53,18 +53,18 @@ export function ActionForm({
             />
           </Form.Item>
           <Form.Item label="Amount ($)" name="amount" rules={[{ required: true }]}>
-            <InputNumber min={0.01} step={50} style={{ width: "100%" }} />
+            <InputNumber min={0.01} step={50} style={{ width: "100%" }} placeholder="0.00" />
           </Form.Item>
         </Form>
       );
     case "take_deposit":
       return (
         <Form form={form} layout="vertical">
-          <Form.Item label="Customer" name="customer" rules={[{ required: true }]} initialValue="Beta LLC">
-            <Input />
+          <Form.Item label="Customer" name="customer" rules={[{ required: true }]}>
+            <Input placeholder="e.g. Beta LLC" />
           </Form.Item>
-          <Form.Item label="Amount ($)" name="amount" rules={[{ required: true }]} initialValue={300}>
-            <InputNumber min={0.01} step={50} style={{ width: "100%" }} />
+          <Form.Item label="Amount ($)" name="amount" rules={[{ required: true }]}>
+            <InputNumber min={0.01} step={50} style={{ width: "100%" }} placeholder="0.00" />
           </Form.Item>
         </Form>
       );
@@ -85,11 +85,11 @@ export function ActionForm({
     case "record_expense":
       return (
         <Form form={form} layout="vertical">
-          <Form.Item label="Category" name="category" rules={[{ required: true }]} initialValue="Office supplies">
-            <Input />
+          <Form.Item label="Category" name="category" rules={[{ required: true }]}>
+            <Input placeholder="e.g. Office supplies" />
           </Form.Item>
-          <Form.Item label="Amount ($)" name="amount" rules={[{ required: true }]} initialValue={100}>
-            <InputNumber min={0.01} step={10} style={{ width: "100%" }} />
+          <Form.Item label="Amount ($)" name="amount" rules={[{ required: true }]}>
+            <InputNumber min={0.01} step={10} style={{ width: "100%" }} placeholder="0.00" />
           </Form.Item>
         </Form>
       );
@@ -124,7 +124,7 @@ export function ActionForm({
           </Form.Item>
           {actionKey !== "write_off" && (
             <Form.Item label="Amount ($)" name="amount" rules={[{ required: true }]}>
-              <InputNumber min={0.01} step={50} style={{ width: "100%" }} />
+              <InputNumber min={0.01} step={50} style={{ width: "100%" }} placeholder="0.00" />
             </Form.Item>
           )}
         </Form>
@@ -145,7 +145,7 @@ export function ActionForm({
             />
           </Form.Item>
           <Form.Item label="Amount ($)" name="amount" rules={[{ required: true }]}>
-            <InputNumber min={0.01} step={50} style={{ width: "100%" }} />
+            <InputNumber min={0.01} step={50} style={{ width: "100%" }} placeholder="0.00" />
           </Form.Item>
         </Form>
       );
@@ -166,11 +166,11 @@ export function ActionForm({
     case "prepaid":
       return (
         <Form form={form} layout="vertical">
-          <Form.Item label="Customer" name="customer" rules={[{ required: true }]} initialValue="Yearly Client">
-            <Input />
+          <Form.Item label="Customer" name="customer" rules={[{ required: true }]}>
+            <Input placeholder="e.g. Yearly Client" />
           </Form.Item>
-          <Form.Item label="Amount ($)" name="amount" rules={[{ required: true }]} initialValue={6000}>
-            <InputNumber min={1} step={1000} style={{ width: "100%" }} />
+          <Form.Item label="Amount ($)" name="amount" rules={[{ required: true }]}>
+            <InputNumber min={1} step={1000} style={{ width: "100%" }} placeholder="0.00" />
           </Form.Item>
           <Form.Item label="Contract months" name="months" rules={[{ required: true }]} initialValue={6}>
             <InputNumber min={1} max={36} style={{ width: "100%" }} />
@@ -180,8 +180,8 @@ export function ActionForm({
     case "recognize":
       return (
         <Form form={form} layout="vertical">
-          <Form.Item label="Amount ($)" name="amount" rules={[{ required: true }]} initialValue={1000}>
-            <InputNumber min={0.01} step={100} style={{ width: "100%" }} />
+          <Form.Item label="Amount ($)" name="amount" rules={[{ required: true }]}>
+            <InputNumber min={0.01} step={100} style={{ width: "100%" }} placeholder="0.00" />
           </Form.Item>
           <Form.Item label="Month label" name="monthLabel" rules={[{ required: true }]} initialValue="Next month">
             <Input />
